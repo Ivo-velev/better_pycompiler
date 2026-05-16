@@ -85,15 +85,35 @@ def parse_statement(line):
             raise(SyntaxError(f"Invalid statement: '{line}'"))
         variable = variable.strip()
         expression = expression.strip()
-        if expression.isnumeric():
-            expression = int(expression)
         return Statement(type="ASSIGN", variable=variable, expression=expression)
 
 def interpreter(input):
     lines = input.splitlines()
+    line_stack = []
     var_store = {}
-    for line in lines:
+    pc = 0
+    while pc < len(lines):
+        line = lines[pc]
         statement = parse_statement(line)
         if statement.type == "ASSIGN":
-            var_store[statement.variable] = statement.expression
+            tokenised_expression = lexer(statement.expression)
+            evaluated_result = evaluate(tokenised_expression, var_store)
+            var_store[statement.variable] = evaluated_result
+        elif statement.type == "WHILE":
+            tokenised_expression = lexer(statement.expression)
+            evaluated_result = evaluate(tokenised_expression, var_store)
+            if evaluated_result == 1:
+                line_stack.append(pc)
+            else:
+                depth = 1
+                while depth > 0:
+                    pc += 1
+                    if lines[pc].startswith("while"):
+                        depth += 1
+                    elif lines[pc].startswith("end"):
+                        depth -= 1
+        elif statement.type == "END":
+            pc = line_stack.pop()
+            continue
+        pc += 1
     return var_store
