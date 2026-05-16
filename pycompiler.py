@@ -85,4 +85,15 @@ def parse_statement(line):
             raise(SyntaxError(f"Invalid statement: '{line}'"))
         variable = variable.strip()
         expression = expression.strip()
+        if expression.isnumeric():
+            expression = int(expression)
         return Statement(type="ASSIGN", variable=variable, expression=expression)
+
+def interpreter(input):
+    lines = input.splitlines()
+    var_store = {}
+    for line in lines:
+        statement = parse_statement(line)
+        if statement.type == "ASSIGN":
+            var_store[statement.variable] = statement.expression
+    return var_store

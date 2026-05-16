@@ -29,7 +29,7 @@ def test_assignment_returns_assignment_statement_object():
 
     assert statement.type == "ASSIGN"
     assert statement.variable == "n"
-    assert statement.expression == "5"
+    assert statement.expression == 5
 
 def test_invalid_assignment_returns_error():
     input = "n"
