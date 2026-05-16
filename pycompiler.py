@@ -1,3 +1,5 @@
+import sys
+
 class CompilerError(Exception):
     def __init__(self, message, line=None):
         self.message = message
@@ -165,3 +167,16 @@ def interpreter(input):
     if line_stack:
         raise SyntaxError("Unclosed 'while' or 'if' block")
     return var_store
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python pycompiler.py <file>")
+        sys.exit(1)
+
+    try:
+        with open(sys.argv[1], "r") as f:
+            source = f.read()
+        interpreter(source)
+    except FileNotFoundError:
+        print(f"Error: File '{sys.argv[1]}' not found")
+        sys.exit(1)
