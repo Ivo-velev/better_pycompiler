@@ -13,6 +13,12 @@ class Token:
         self.value = value
         self.line = line
 
+class Statement:
+    def __init__(self, type, variable=None, expression=None):
+        self.type = type
+        self.variable = variable
+        self.expression = expression
+
 def lexer(input):
     lines = input.splitlines()
     tokens = []
@@ -62,3 +68,21 @@ def evaluate(tokens, variables=None):
             elif token.value == ">=":
                 stack.append(1 if lhs >= rhs else 0)
     return stack[0]
+
+def parse_statement(line):
+    parts = line.split()
+    if "end" == parts[0]:
+        return Statement(type="END")
+    elif "while" == parts[0]:
+        if len(parts) < 2:
+            raise(SyntaxError("Missing condition after while"))
+        expression = " ".join(parts[1:])
+        return Statement(type="WHILE", expression=expression)
+    else:
+        try:
+            variable, expression = line.split("=", 1)
+        except ValueError:
+            raise(SyntaxError(f"Invalid statement: '{line}'"))
+        variable = variable.strip()
+        expression = expression.strip()
+        return Statement(type="ASSIGN", variable=variable, expression=expression)
