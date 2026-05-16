@@ -81,3 +81,10 @@ def test_lexer_parses_assignment():
     assert tokens[2].type == "NUMBER"
     assert tokens[2].value == 5
     assert tokens[2].line == 1
+
+def test_lexer_parses_print_as_a_keyword():
+    input = "print"
+
+    tokens = lexer(input)
+
+    assert tokens[0].type == "KEYWORD"

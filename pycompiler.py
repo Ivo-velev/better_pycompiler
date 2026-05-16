@@ -28,7 +28,7 @@ def lexer(input):
         for char in chars:
             if char.isnumeric():
                 tokens.append(Token(type="NUMBER", value=int(char), line=line_number))
-            elif char in ["while", "end"]:
+            elif char in ["while", "end", "print"]:
                 tokens.append(Token(type="KEYWORD", value=char, line=line_number))
             elif char.isalpha():
                 tokens.append(Token(type="IDENT", value=char, line=line_number))
