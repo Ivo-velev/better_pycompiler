@@ -99,6 +99,8 @@ def parse_statement(line):
             raise(SyntaxError(f"Invalid statement: '{line}'"))
         variable = variable.strip()
         expression = expression.strip()
+        if not variable:
+            raise(SyntaxError("Missing variable name in assignment"))
         return Statement(type="ASSIGN", variable=variable, expression=expression)
 
 def interpreter(input):
@@ -160,4 +162,6 @@ def interpreter(input):
             elif line_stack:
                 line_stack.pop()
         pc += 1
+    if line_stack:
+        raise SyntaxError("Unclosed 'while' or 'if' block")
     return var_store
