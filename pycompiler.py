@@ -28,7 +28,7 @@ def lexer(input):
         for char in chars:
             if char.isnumeric():
                 tokens.append(Token(type="NUMBER", value=int(char), line=line_number))
-            elif char in ["while", "end", "print"]:
+            elif char in ["while", "end", "print", "if", "else"]:
                 tokens.append(Token(type="KEYWORD", value=char, line=line_number))
             elif char.isalpha():
                 tokens.append(Token(type="IDENT", value=char, line=line_number))
@@ -78,6 +78,15 @@ def parse_statement(line):
             raise(SyntaxError("Missing condition after while"))
         expression = " ".join(parts[1:])
         return Statement(type="WHILE", expression=expression)
+    elif "if" == parts[0]:
+        if len(parts) < 2:
+            raise(SyntaxError("Missing condition after if"))
+        expression = " ".join(parts[1:])
+        return Statement(type="IF", expression=expression)
+    elif "else" == parts[0]:
+        if len(parts) > 1:
+            raise(SyntaxError("'else' doesn't take an expression"))
+        return Statement(type="ELSE")
     elif "print" == parts[0]:
         if len(parts) < 2:
             raise(SyntaxError("Missing expression after print"))
@@ -90,6 +99,8 @@ def parse_statement(line):
             raise(SyntaxError(f"Invalid statement: '{line}'"))
         variable = variable.strip()
         expression = expression.strip()
+        if not variable:
+            raise(SyntaxError("Missing variable name in assignment"))
         return Statement(type="ASSIGN", variable=variable, expression=expression)
 
 def interpreter(input):
@@ -108,11 +119,34 @@ def interpreter(input):
             tokenised_expression = lexer(statement.expression)
             evaluated_result = evaluate(tokenised_expression, var_store)
             print(evaluated_result)
+        elif statement.type == "IF":
+            tokenised_expression = lexer(statement.expression)
+            evaluated_result = evaluate(tokenised_expression, var_store)
+            if evaluated_result == 1:
+                line_stack.append((pc, "IF"))
+            else:
+                depth = 1
+                while depth > 0:
+                    pc += 1
+                    if lines[pc].startswith("if"):
+                        depth += 1
+                    elif lines[pc].startswith("end") or lines[pc].startswith("else"):
+                        depth -= 1
+        elif statement.type == "ELSE":
+            if line_stack and line_stack[-1][1] == "IF":
+                line_stack.pop()
+                depth = 1
+                while depth > 0:
+                    pc += 1
+                    if lines[pc].startswith("if"):
+                        depth += 1
+                    elif lines[pc].startswith("end"):
+                        depth -= 1
         elif statement.type == "WHILE":
             tokenised_expression = lexer(statement.expression)
             evaluated_result = evaluate(tokenised_expression, var_store)
             if evaluated_result == 1:
-                line_stack.append(pc)
+                line_stack.append((pc, "WHILE"))
             else:
                 depth = 1
                 while depth > 0:
@@ -122,7 +156,12 @@ def interpreter(input):
                     elif lines[pc].startswith("end"):
                         depth -= 1
         elif statement.type == "END":
-            pc = line_stack.pop()
-            continue
+            if line_stack and line_stack[-1][1] == "WHILE":
+                pc = line_stack.pop()[0]
+                continue
+            elif line_stack:
+                line_stack.pop()
         pc += 1
+    if line_stack:
+        raise SyntaxError("Unclosed 'while' or 'if' block")
     return var_store

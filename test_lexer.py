@@ -88,3 +88,17 @@ def test_lexer_parses_print_as_a_keyword():
     tokens = lexer(input)
 
     assert tokens[0].type == "KEYWORD"
+
+def test_lexer_parses_if_as_a_keyword():
+    input = "if 1 1 >="
+
+    tokens = lexer(input)
+
+    assert tokens[0].type == "KEYWORD"
+
+def test_lexer_parses_else_as_a_keyword():
+    input = "else"
+
+    tokens = lexer(input)
+
+    assert tokens[0].type == "KEYWORD"
