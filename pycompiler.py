@@ -1,3 +1,12 @@
+class CompilerError(Exception):
+    def __init__(self, message, line=None):
+        self.message = message
+        self.line = line
+        super().__init__(f"Error (line {line}): {message}" if line else f"Error: {message}")
+
+class UndefinedVariableError(CompilerError): pass
+class StackUnderflowError(CompilerError): pass
+
 class Token:
     def __init__(self, type, value, line):
         self.type = type
@@ -24,3 +33,32 @@ def lexer(input):
             else:
                 raise SyntaxError("Unexpected character '%s'" % char)
     return tokens
+
+def evaluate(tokens, variables=None):
+    if variables is None:
+        variables = {}
+    stack = []
+    for token in tokens:
+        if token.type == "NUMBER":
+            stack.append(token.value)
+        elif token.type == "IDENT":
+            if token.value in variables:
+                stack.append(variables[token.value])
+            else:
+                raise UndefinedVariableError(f"Undefined variable '{token.value}'", token.line)
+        elif token.type == "OPERATOR":
+            try:
+                rhs = stack.pop()
+                lhs = stack.pop()
+            except IndexError:
+                raise StackUnderflowError(f"Not enough values for operator '{token.value}'", token.line)
+
+            if token.value == "+":
+                stack.append(lhs + rhs)
+            elif token.value == "-":
+                stack.append(lhs - rhs)
+            elif token.value == "*":
+                stack.append(lhs * rhs)
+            elif token.value == ">=":
+                stack.append(1 if lhs >= rhs else 0)
+    return stack[0]
