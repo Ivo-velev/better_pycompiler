@@ -117,11 +117,34 @@ def interpreter(input):
             tokenised_expression = lexer(statement.expression)
             evaluated_result = evaluate(tokenised_expression, var_store)
             print(evaluated_result)
+        elif statement.type == "IF":
+            tokenised_expression = lexer(statement.expression)
+            evaluated_result = evaluate(tokenised_expression, var_store)
+            if evaluated_result == 1:
+                line_stack.append((pc, "IF"))
+            else:
+                depth = 1
+                while depth > 0:
+                    pc += 1
+                    if lines[pc].startswith("if"):
+                        depth += 1
+                    elif lines[pc].startswith("end") or lines[pc].startswith("else"):
+                        depth -= 1
+        elif statement.type == "ELSE":
+            if line_stack and line_stack[-1][1] == "IF":
+                line_stack.pop()
+                depth = 1
+                while depth > 0:
+                    pc += 1
+                    if lines[pc].startswith("if"):
+                        depth += 1
+                    elif lines[pc].startswith("end"):
+                        depth -= 1
         elif statement.type == "WHILE":
             tokenised_expression = lexer(statement.expression)
             evaluated_result = evaluate(tokenised_expression, var_store)
             if evaluated_result == 1:
-                line_stack.append(pc)
+                line_stack.append((pc, "WHILE"))
             else:
                 depth = 1
                 while depth > 0:
@@ -131,7 +154,10 @@ def interpreter(input):
                     elif lines[pc].startswith("end"):
                         depth -= 1
         elif statement.type == "END":
-            pc = line_stack.pop()
-            continue
+            if line_stack and line_stack[-1][1] == "WHILE":
+                pc = line_stack.pop()[0]
+                continue
+            elif line_stack:
+                line_stack.pop()
         pc += 1
     return var_store

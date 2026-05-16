@@ -79,3 +79,17 @@ def test_print_statement_prints_result_of_expression(capsys):
     captured = capsys.readouterr()
 
     assert captured.out.strip() == "6"
+
+def test_if_statement_returns_correct_variable_store():
+    input = "n = 5\nif n 1 >=\nn = 0\nend"
+
+    result = interpreter(input)
+
+    assert result["n"] == 0
+
+def test_falsey_if_statement_goes_into_else():
+    input = "n = 0\nif n 1 >=\nn = 1\nelse\nn = 5\nend"
+
+    result = interpreter(input)
+
+    assert result["n"] == 5
