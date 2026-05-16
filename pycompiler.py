@@ -78,6 +78,11 @@ def parse_statement(line):
             raise(SyntaxError("Missing condition after while"))
         expression = " ".join(parts[1:])
         return Statement(type="WHILE", expression=expression)
+    elif "print" == parts[0]:
+        if len(parts) < 2:
+            raise(SyntaxError("Missing expression after print"))
+        expression = " ".join(parts[1:])
+        return Statement(type="PRINT", expression=expression)
     else:
         try:
             variable, expression = line.split("=", 1)

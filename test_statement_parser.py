@@ -35,3 +35,16 @@ def test_invalid_assignment_returns_error():
     input = "n"
     with pytest.raises(SyntaxError):
         parse_statement(input)
+
+def test_print_returns_PRINT_statement_object():
+    input = "print n"
+
+    statement = parse_statement(input)
+
+    assert statement.type == "PRINT"
+    assert statement.expression == "n"
+
+def test_print_without_expression_returns_syntax_error():
+    input = "print"
+    with pytest.raises(SyntaxError):
+        parse_statement(input)
