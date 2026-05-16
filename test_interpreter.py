@@ -52,3 +52,12 @@ def test_nested_while_loops_return_correct_variable_store():
 
     assert result["n"] == 0
     assert result["m"] == 0
+
+def test_print_statement_prints_5(capsys):
+    input = "n = 5\nprint n"
+
+    interpreter(input)
+
+    captured = capsys.readouterr()
+
+    assert captured.out.strip() == "5"

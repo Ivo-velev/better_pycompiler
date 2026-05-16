@@ -104,6 +104,10 @@ def interpreter(input):
             tokenised_expression = lexer(statement.expression)
             evaluated_result = evaluate(tokenised_expression, var_store)
             var_store[statement.variable] = evaluated_result
+        elif statement.type == "PRINT":
+            tokenised_expression = lexer(statement.expression)
+            evaluated_result = evaluate(tokenised_expression, var_store)
+            print(evaluated_result)
         elif statement.type == "WHILE":
             tokenised_expression = lexer(statement.expression)
             evaluated_result = evaluate(tokenised_expression, var_store)
