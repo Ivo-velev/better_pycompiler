@@ -78,6 +78,15 @@ def parse_statement(line):
             raise(SyntaxError("Missing condition after while"))
         expression = " ".join(parts[1:])
         return Statement(type="WHILE", expression=expression)
+    elif "if" == parts[0]:
+        if len(parts) < 2:
+            raise(SyntaxError("Missing condition after if"))
+        expression = " ".join(parts[1:])
+        return Statement(type="IF", expression=expression)
+    elif "else" == parts[0]:
+        if len(parts) > 1:
+            raise(SyntaxError("'else' doesn't take an expression"))
+        return Statement(type="ELSE")
     elif "print" == parts[0]:
         if len(parts) < 2:
             raise(SyntaxError("Missing expression after print"))
