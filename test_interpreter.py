@@ -93,3 +93,12 @@ def test_falsey_if_statement_goes_into_else():
     result = interpreter(input)
 
     assert result["n"] == 5
+
+test_input = ["n = 0\nend", "n = 0\nend ", "n = 0\nend  "]
+
+@pytest.mark.parametrize("input", test_input)
+def test_empty_newline_does_not_fail(input):
+
+    result = interpreter(input)
+
+    assert result["n"] == 0

@@ -112,6 +112,9 @@ def interpreter(input):
     pc = 0
     while pc < len(lines):
         line = lines[pc]
+        if not line.strip():
+            pc += 1
+            continue
         statement = parse_statement(line)
         if statement.type == "ASSIGN":
             tokenised_expression = lexer(statement.expression)
